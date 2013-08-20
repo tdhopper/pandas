@@ -59,13 +59,14 @@ def _eval_single_bin(lhs, cmp1, rhs, engine):
 
 
 def _series_and_2d_ndarray(lhs, rhs):
-    return (com.is_series(lhs) and isinstance(rhs, np.ndarray) and rhs.ndim > 1
-            or com.is_series(rhs) and isinstance(lhs, np.ndarray) and lhs.ndim
-            > 1)
+    return ((com.is_series(lhs) and
+             isinstance(rhs, np.ndarray) and rhs.ndim > 1)
+            or (com.is_series(rhs) and
+                isinstance(lhs, np.ndarray) and lhs.ndim > 1))
 
 
 def _bool_and_frame(lhs, rhs):
-    return isinstance(lhs, bool) and com.is_frame(rhs)
+    return isinstance(lhs, bool) and com.is_ndframe(rhs)
 
 
 def skip_incompatible_operand(f):
@@ -209,13 +210,13 @@ class TestEvalNumexprPandas(unittest.TestCase):
     def check_chained_cmp_op(self, lhs, cmp1, mid, cmp2, rhs):
         # these are not compatible operands
         if _series_and_2d_ndarray(lhs, mid):
-            self.assertRaises(ValueError, _eval_single_bin, lhs, cmp2, mid,
+            self.assertRaises(Exception, _eval_single_bin, lhs, cmp2, mid,
                               self.engine)
         else:
             lhs_new = _eval_single_bin(lhs, cmp1, mid, self.engine)
 
         if _series_and_2d_ndarray(mid, rhs):
-            self.assertRaises(ValueError, _eval_single_bin, mid, cmp2, rhs,
+            self.assertRaises(Exception, _eval_single_bin, mid, cmp2, rhs,
                               self.engine)
         else:
             rhs_new = _eval_single_bin(mid, cmp2, rhs, self.engine)
