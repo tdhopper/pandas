@@ -2469,6 +2469,16 @@ class TestToDatetime(tm.TestCase):
                            Timestamp('20160305 00:0:00')])
         assert_series_equal(result, expected)
 
+        # Int8 and Int64 values are OK
+        result = to_datetime(pd.DataFrame({'year': df['year'],
+                             'month': df['month'],
+                             'day': df['day']}).astype('int16'))
+        assert_series_equal(result, expected)
+        result = to_datetime(pd.DataFrame({'year': df['year'],
+                             'month': df['month'],
+                             'day': df['day']}).astype('int8'))
+        assert_series_equal(result, expected)
+
         # dict-like
         result = to_datetime(df[['year', 'month', 'day']].to_dict())
         assert_series_equal(result, expected)
